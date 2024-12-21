@@ -52,38 +52,52 @@ const average = (arr) =>
 
 const KEY = "6a9c60ea";
 export default function App() {
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setisLoading] = useState(false);
   const [error, setError] = useState("");
-  const query = "ssswehw";
-  useEffect(function () {
-    async function fetchMovies() {
-      try {
-        setisLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY} &s=${query}`
-        );
-        if (!res.ok)
-          throw new Error("Something went wrong with fetching movies");
-        const data = await res.json();
-        if (data.Response === "False") throw new Error("Movie not found");
-        setMovies(data.Search);
-      } catch (err) {
-        console.log(err.message);
-        setError(err.message);
-      } finally {
-        setisLoading(false);
+  const tempquery = "squid";
+  // useEffect{function(){
+
+  // },[]}
+  useEffect(
+    function () {
+      async function fetchMovies() {
+        try {
+          setisLoading(true);
+          setError("");
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${KEY} &s=${query}`
+          );
+          if (!res.ok)
+            throw new Error("Something went wrong with fetching movies");
+          const data = await res.json();
+          if (data.Response === "False" && query.length !== 0)
+            throw new Error("Movie not found");
+          setMovies(data.Search);
+        } catch (err) {
+          console.log(err.message);
+          setError(err.message);
+        } finally {
+          setisLoading(false);
+        }
       }
-    }
-    fetchMovies();
-  }, []);
+      if (query.length < 3) {
+        setMovies([]);
+        setError("");
+        return;
+      }
+      fetchMovies();
+    },
+    [query]
+  );
 
   return (
     <>
       <Navbar>
         <Logo />
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResult movies={movies} />
       </Navbar>
       <Main>
@@ -116,8 +130,7 @@ function Errormessage({ message }) {
 function Navbar({ children }) {
   return <nav className="nav-bar">{children}</nav>;
 }
-function Search() {
-  const [query, setQuery] = useState("");
+function Search({ query, setQuery }) {
   return (
     <input
       className="search"
