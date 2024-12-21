@@ -56,7 +56,7 @@ export default function App() {
   const [watched, setWatched] = useState([]);
   const [isLoading, setisLoading] = useState(false);
   const [error, setError] = useState("");
-  const query = "interstellar";
+  const query = "ssswehw";
   useEffect(function () {
     async function fetchMovies() {
       try {
@@ -67,11 +67,13 @@ export default function App() {
         if (!res.ok)
           throw new Error("Something went wrong with fetching movies");
         const data = await res.json();
+        if (data.Response === "False") throw new Error("Movie not found");
         setMovies(data.Search);
-        setisLoading(false);
       } catch (err) {
         console.log(err.message);
         setError(err.message);
+      } finally {
+        setisLoading(false);
       }
     }
     fetchMovies();
@@ -85,7 +87,12 @@ export default function App() {
         <NumResult movies={movies} />
       </Navbar>
       <Main>
-        <Box>{isLoading ? <Loader /> : <MovieList movies={movies} />}</Box>
+        <Box>
+          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MovieList movies={movies} />}
+          {error && <Errormessage message={error} />}
+        </Box>
         <Box>
           <WatchSummary watched={watched} />
           <WathedMovieList watched={watched} />
@@ -97,7 +104,15 @@ export default function App() {
 function Loader() {
   return <p className="loader">Loading... </p>;
 }
-
+function Errormessage({ message }) {
+  return (
+    <p className="error">
+      {" "}
+      <span>⛔</span>
+      {message}
+    </p>
+  );
+}
 function Navbar({ children }) {
   return <nav className="nav-bar">{children}</nav>;
 }
