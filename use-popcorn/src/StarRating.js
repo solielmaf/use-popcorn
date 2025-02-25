@@ -6,7 +6,7 @@ const startContainerStyle = { display: "flex", gap: "4px" };
 export default function StarRating({
   maxRating = 10,
   color = "#fcc419",
-  size = 49,
+  size = 24,
   defaultRating = 0,
 }) {
   const [rating, setRating] = useState(defaultRating);
